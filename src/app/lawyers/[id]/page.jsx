@@ -6,6 +6,7 @@ import { useSession } from "@/lib/auth-client";
 import HireModal from "@/components/HireModal";
 import LawyerComments from "@/components/LawyerComments";
 import toast from 'react-hot-toast';
+import { authClient } from '@/lib/auth-client';
 
 function SkeletonDetail() {
   return (
@@ -41,6 +42,7 @@ export default function LawyerDetailsPage() {
     if (!id) return;
     const fetchLawyer = async () => {
       try {
+       
         const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/lawyer/${id}`);
         if (!res.ok) throw new Error("Lawyer not found");
         const data = await res.json();

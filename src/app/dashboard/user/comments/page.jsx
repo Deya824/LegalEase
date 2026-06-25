@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useSession } from "@/lib/auth-client";
 import toast from 'react-hot-toast';
+import {authClient} from "@/lib/auth-client";
 
 export default function MyCommentsPage() {
   const { data: session } = useSession();
@@ -32,9 +33,13 @@ export default function MyCommentsPage() {
   };
 
   const handleUpdate = async (id) => {
+    const {data:token}=await authClient.token();
     const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/comments/${id}`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token.token}`
+      },
       body: JSON.stringify({ text: editText })
     });
 
@@ -47,9 +52,14 @@ export default function MyCommentsPage() {
     }
   };
 
+
   const handleDelete = async (id) => {
+      const {data:token}=await authClient.token();
     const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/comments/${id}`, {
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token.token}`
+      }
     });
 
     if (res.ok) {

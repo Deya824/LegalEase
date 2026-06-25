@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useSession } from "@/lib/auth-client";
 import toast from 'react-hot-toast';
 
+import {authClient} from "@/lib/auth-client"
 export default function LawyerHiringHistoryPage() {
   const { data: session } = useSession();
   const [requests, setRequests] = useState([]);
@@ -14,8 +15,13 @@ export default function LawyerHiringHistoryPage() {
     fetchRequests();
   }, [session]);
 
-  const fetchRequests = () => {
-    fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/hire/lawyer/${session.user.id}`)
+  const fetchRequests = async () => {
+    const {data:token}=await authClient.token();
+    fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/hire/lawyer/${session.user.id}`, {
+      headers: {
+        'Authorization': `Bearer ${token.token}`
+      }
+    })
       .then(res => res.json())
       .then(data => {
         setRequests(data);
@@ -25,9 +31,13 @@ export default function LawyerHiringHistoryPage() {
   };
 
   const handleStatusUpdate = async (id, status) => {
+    const {data:token}=await authClient.token();
     const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/hire/${id}`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token.token}`
+      },
       body: JSON.stringify({ status })
     });
 

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useSession } from "@/lib/auth-client";
 import { useRouter, useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
+import {authClient} from "@/lib/auth-client";
 
 export default function UserHiringHistoryPage() {
   const { data: session } = useSession();
@@ -30,6 +31,7 @@ export default function UserHiringHistoryPage() {
   }, [searchParams]);
 
   const fetchRequests = () => {
+    
     fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/hire/client/${session.user.id}`)
       .then(res => res.json())
       .then(data => {
@@ -40,8 +42,12 @@ export default function UserHiringHistoryPage() {
   };
 
   const markAsPaid = async (hireId) => {
+    const {data:token}=await authClient.token();
     const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/hire/${hireId}/pay`, {
       method: 'PATCH',
+      headers: {
+        'Authorization': `Bearer ${token.token}`
+      }
     });
 
     if (res.ok) {
@@ -58,9 +64,12 @@ export default function UserHiringHistoryPage() {
     setPayingId(req._id);
 
     try {
+    
       const res = await fetch('/api/checkout_sessions', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify({
           hireId: req._id,
           lawyerName: req.lawyerName,

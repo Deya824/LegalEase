@@ -6,7 +6,7 @@ import { Card, Button, Input } from "@heroui/react";
 import Link from "next/link";
 import toast, { Toaster } from "react-hot-toast";
 import { Eye, EyeSlash, Person, At, ShieldKeyhole } from "@gravity-ui/icons";
-import { signUp, useSession } from "@/lib/auth-client";
+import { authClient, signUp, useSession } from "@/lib/auth-client";
 
 export default function SignupPage() {
     const router = useRouter();
@@ -58,10 +58,15 @@ export default function SignupPage() {
             setIsLoading(false);
         }
     };
-
+ const handleGoogleSignup = async () => {
+    await authClient.signIn.social({
+        provider: "google",
+        callbackURL: "/auth/select-role",
+    });
+};
     return (
         <div className="flex min-h-screen items-center justify-center bg-[#0B0B0F] px-4">
-            <Toaster position="top-right" />
+            
             <Card className="w-full max-w-md p-8 border border-white/10 bg-[#1e293b] shadow-2xl">
                 <div className="mb-8 text-center">
                     <h1 className="text-2xl font-bold text-white">Create an account</h1>
@@ -77,6 +82,14 @@ export default function SignupPage() {
                     <Button type="submit" isLoading={isLoading} className="w-full bg-amber-400 font-bold text-black mt-4">
                         Sign Up
                     </Button>
+                    
+                    <div>
+                        <Button onClick={handleGoogleSignup} className="w-full font-semibold rounded-xl text-sm h-12" >
+
+                            Sign Up With Google
+                        </Button>
+                    </div>
+
                 </form>
             </Card>
         </div>

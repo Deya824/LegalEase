@@ -113,7 +113,7 @@ export default function HomePage() {
 useEffect(() => {
   const fetchFeatured = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/lawyers");
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/lawyers`);
       const data = await res.json();
 
       const lawyers = Array.isArray(data)
@@ -145,7 +145,8 @@ useEffect(() => {
   useEffect(() => {
     const fetchTop = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/lawyers?limit=3&sort=hires");
+       //${process.env.NEXT_PUBLIC_SERVER_URL}
+        const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/lawyers?limit=3&sort=hires`);
         const data = await res.json();
         setTopLawyers(Array.isArray(data) ? data.slice(0, 3) : (data.lawyers || []).slice(0, 3));
       } catch {
@@ -163,7 +164,7 @@ useEffect(() => {
       setLoadingBrowse(true);
       try {
         const res = await fetch(
-          `http://localhost:5000/api/lawyers?page=${currentPage}&limit=${LAWYERS_PER_PAGE}`
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/api/lawyers?page=${currentPage}&limit=${LAWYERS_PER_PAGE}`
         );
         const data = await res.json();
         if (Array.isArray(data)) {

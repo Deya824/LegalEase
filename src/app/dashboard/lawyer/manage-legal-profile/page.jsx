@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { Input, Button, Card, Chip } from "@heroui/react";
 import toast, { Toaster } from "react-hot-toast";
 import { useSession } from "@/lib/auth-client";
+import { authClient } from '@/lib/auth-client';
 
 const SPECIALIZATIONS = [
   "Criminal Law",
@@ -54,7 +55,8 @@ export default function ManageLegalProfile() {
     if (!session?.user?.id) return;
     const fetchProfile = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/lawyer/${session.user.id}`);
+        
+        const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/lawyer/${session.user.id}`);
         const data = await res.json();
         if (data?.userId) {
           setProfile({
@@ -116,10 +118,14 @@ export default function ManageLegalProfile() {
     }
     setLoading(true);
     try {
+      const {data:token}=await authClient.token();
       const method = isInitialized ? "PATCH" : "POST";
-      const res = await fetch("http://localhost:5000/api/lawyer/profile", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/lawyer/profile`, {
         method,
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token.token}`
+        },
         body: JSON.stringify({
           ...profile,
           userId: session.user.id,
@@ -191,9 +197,13 @@ export default function ManageLegalProfile() {
     if (!session?.user?.id) return;
     setServicesLoading(true);
     try {
-      await fetch("http://localhost:5000/api/lawyer/services", {
+       const {data:token}=await authClient.token()
+      await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/lawyer/services`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token.token}`
+        },
         body: JSON.stringify({
           userId: session.user.id,
           services: updatedServices,

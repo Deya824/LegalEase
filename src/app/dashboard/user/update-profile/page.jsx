@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { useSession } from "@/lib/auth-client";
+import { authClient, useSession } from "@/lib/auth-client";
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 
@@ -16,21 +16,34 @@ export default function UpdateProfilePage() {
     e.preventDefault();
     setIsSubmitting(true);
 
+    // Ensure session.user.id exists
+    if (!session?.user?.id) {
+        toast.error("User not authenticated");
+        setIsSubmitting(false);
+        return;
+    }
+ const {data:token}=await authClient.token();
     const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/auth/update-user`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ name, image })
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token.token}`
+      },
+      body: JSON.stringify({ 
+        userId: session.user.id, // Sending ID to identify the user
+        name, 
+        image 
+      })
     });
 
     if (res.ok) {
       toast.success("Profile updated successfully!");
-      router.push("/dashboard");
+      router.refresh();
     } else {
       toast.error("Failed to update profile");
     }
     setIsSubmitting(false);
-  };
+};
 
   return (
     <div className="max-w-2xl">

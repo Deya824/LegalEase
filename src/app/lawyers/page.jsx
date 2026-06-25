@@ -92,7 +92,8 @@ export default function BrowseLawyersPage() {
   useEffect(() => {
     const fetchLawyers = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/lawyers");
+
+        const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/lawyers`);
         if (!res.ok) throw new Error("Failed to fetch lawyers");
         const data = await res.json();
         setLawyers(data);
@@ -118,6 +119,7 @@ export default function BrowseLawyersPage() {
       if (sort === "fee_asc") return Number(a.fee) - Number(b.fee);
       if (sort === "fee_desc") return Number(b.fee) - Number(a.fee);
       if (sort === "name") return a.name?.localeCompare(b.name);
+
       return 0;
     });
 
